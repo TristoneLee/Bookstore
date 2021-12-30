@@ -85,6 +85,7 @@ LogSystem::LogSystem() : financeDocument("FinanceFile"), operationDocument("Oper
         basicData.read(reinterpret_cast<char *>(&time), sizeof(int));
         basicData.seekg(sizeof(int));
         basicData.read(reinterpret_cast<char *>(&currentFinance), sizeof(Finance));
+        basicData.close();
     }
 }
 
@@ -127,6 +128,7 @@ LogSystem::~LogSystem() {
     basicData.write(reinterpret_cast<char *>(&time), sizeof(int));
     basicData.seekp(sizeof(int));
     basicData.write(reinterpret_cast<char *>(&currentFinance), sizeof(Finance));
+    basicData.close();
 }
 
 void Save_Operation() {}
