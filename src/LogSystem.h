@@ -81,7 +81,6 @@ LogSystem::LogSystem() : financeDocument("FinanceFile"), operationDocument("Oper
         basicData.open("basicData", std::fstream::out);
         basicData.close();
     } else {
-        basicData.open("basicData");
         basicData.seekg(0);
         basicData.read(reinterpret_cast<char *>(&time), sizeof(int));
         basicData.seekg(sizeof(int));
@@ -124,9 +123,9 @@ void LogSystem::Show_Finance() {
 
 LogSystem::~LogSystem() {
     basicData.open("basicData");
-    basicData.seekg(0);
+    basicData.seekp(0);
     basicData.write(reinterpret_cast<char *>(&time), sizeof(int));
-    basicData.seekg(sizeof(int));
+    basicData.seekp(sizeof(int));
     basicData.write(reinterpret_cast<char *>(&currentFinance), sizeof(Finance));
 }
 

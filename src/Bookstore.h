@@ -217,11 +217,11 @@ void Bookstore::Buy() {
     ans = book_system.Query_Book(MyString::to_MyString(tokens.front()), 1);
     if (ans.empty()) throw "Invalid";
     book_system.Takeout_Book(ans.front());
-    double a;
+    double a=0;
     try {
         a = book_system.Sell_Book(ans.front(), std::atoi(tokens.back().c_str()));
     }
-    catch (...) {
+    catch (int) {
         book_system.Update_Book(ans.front());
         throw "Invalid";
     }

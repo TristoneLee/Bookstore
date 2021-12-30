@@ -166,10 +166,12 @@ void BookSystem::Restock_Book(Book &obj, int quantity) {
 }
 
 double BookSystem::Sell_Book(Book &obj, int quantity) {
-    if (obj.Quantity < quantity) throw "Invalid";
-    else obj.Quantity -= quantity;
-    cout << std::fixed << std::setprecision(2) << quantity * obj.Price << "\n";
-    return quantity * obj.Price;
+    if (obj.Quantity < quantity) throw 1;
+    else {
+        obj.Quantity -= quantity;
+        cout << std::fixed << std::setprecision(2) << quantity * obj.Price << "\n";
+        return quantity * obj.Price;
+    }
 }
 
 vector<Book> BookSystem::Show_All() {
@@ -188,7 +190,7 @@ void Book::Display() {
         cout << Keywords[i] << "|";
     }
     cout << Keywords[KeywordsNum-1] << '\t' << std::fixed << std::setprecision(2)
-    << Price << '\t' << std::fixed << std::setprecision(2)<< Quantity << '\t' << '\n';
+    << Price << '\t' << std::fixed << std::setprecision(2)<< Quantity  << '\n';
 }
 
 
