@@ -75,18 +75,17 @@ public:
 Finance::Finance(double income, double expenditure, int time) : Income(income), Expenditure(expenditure), Time(time) {}
 
 LogSystem::LogSystem() : financeDocument("FinanceFile"), operationDocument("OperationFlie") {
-    if(!std::filesystem::exists("FinanceFile"))
-    financeDocument.Add(Pair(MyString("0"),Finance()));
-    if(!std::filesystem::exists("basicData")){
-        basicData.open("basicData",std::ios::out);
+    basicData.open("basicData");
+    if (!basicData) {
+        basicData.clear();
+        basicData.open("basicData", std::fstream::out);
         basicData.close();
-    }
-    else {
+    } else {
         basicData.open("basicData");
         basicData.seekg(0);
-        basicData.read(reinterpret_cast<char*>(&time),sizeof(int));
+        basicData.read(reinterpret_cast<char *>(&time), sizeof(int));
         basicData.seekg(sizeof(int));
-        basicData.read(reinterpret_cast<char*>(&currentFinance),sizeof(Finance));
+        basicData.read(reinterpret_cast<char *>(&currentFinance), sizeof(Finance));
     }
 }
 
@@ -106,10 +105,15 @@ void LogSystem::Save_Finance(double amount, bool sign) {
 
 void LogSystem::Show_Finance_Log(int _time) {
     if (_time > time) throw "Invalid";
-    vector<Finance> ans;
-    ans = financeDocument.Find(MyString::to_MyString(std::to_string(time - _time)));
-    cout << "+ " << std::fixed << std::setprecision(2) << currentFinance.Income - ans.front().Income
-         << " - " << currentFinance.Expenditure - ans.front().Expenditure << '\n';
+    else if (_time==time) {
+        cout << "+ " << std::fixed << std::setprecision(2) << currentFinance.Income
+             << " - " << currentFinance.Expenditure << '\n';
+    } else {
+        vector<Finance> ans;
+        ans = financeDocument.Find(MyString::to_MyString(std::to_string(time - _time)));
+        cout << "+ " << std::fixed << std::setprecision(2) << currentFinance.Income - ans.front().Income
+             << " - " << currentFinance.Expenditure - ans.front().Expenditure << '\n';
+    }
 }
 
 
@@ -121,9 +125,9 @@ void LogSystem::Show_Finance() {
 LogSystem::~LogSystem() {
     basicData.open("basicData");
     basicData.seekg(0);
-    basicData.write(reinterpret_cast<char*>(&time),sizeof(int));
+    basicData.write(reinterpret_cast<char *>(&time), sizeof(int));
     basicData.seekg(sizeof(int));
-    basicData.write(reinterpret_cast<char*>(&currentFinance),sizeof(Finance));
+    basicData.write(reinterpret_cast<char *>(&currentFinance), sizeof(Finance));
 }
 
 void Save_Operation() {}
