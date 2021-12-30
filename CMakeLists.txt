@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 include_directories(
         ${PROJECT_SOURCE_DIR}/src/
-        ${PROJECT_SOURCE_DIR}/bin/
 )
 set(src_dir
         ${PROJECT_SOURCE_DIR}/src/main.cpp
@@ -16,5 +15,3 @@ set(src_dir
         ${PROJECT_SOURCE_DIR}/src/AccountSystem.h
         ${PROJECT_SOURCE_DIR}/src/MyString.h)
 add_executable(code ${src_dir})
-
-target_link_libraries(code ${PROJECT_SOURCE_DIR}/bin/libUll.a)
