@@ -29,12 +29,9 @@ void Split(const string &str,
     }
 }
 
-bool ISBN_Checker(const string &str)
-{
-    for (int i = 0; i<str.size(); i++)
-    {
-        if (!isdigit(str[i]))
-        {
+bool ISBN_Checker(const string &str) {
+    for (int i = 0; i < str.size(); i++) {
+        if (!isdigit(str[i])) {
             return false;
         }
     }
@@ -98,7 +95,7 @@ public:
 
 void Bookstore::work() {
     string command;
-    cin >> command;
+    if(!(cin >> command)) Bookstore::Quit();
     if (command == "quit") { Bookstore::Quit(); }
     else if (command == "exit") { Bookstore::Exit(); }
     else if (command == "su") { Bookstore::Su(); }
@@ -201,7 +198,7 @@ void Bookstore::Useradd() {
 void Bookstore::Delete() {
     string statement;
     getline(cin, statement);
-    if (account_system.currentAccount.Get_Rank()<7) throw "Invalid";
+    if (account_system.currentAccount.Get_Rank() < 7) throw "Invalid";
     Trim(statement);
     vector<string> tokens;
     Split(statement, tokens);
@@ -235,7 +232,7 @@ void Bookstore::Buy() {
 void Bookstore::Select() {
     string statement;
     getline(cin, statement);
-    if (account_system.currentAccount.Get_Rank()<3) throw "Invalid";
+    if (account_system.currentAccount.Get_Rank() < 3) throw "Invalid";
     Trim(statement);
     vector<string> tokens;
     Split(statement, tokens);
@@ -289,7 +286,7 @@ void Bookstore::Show() {
 void Bookstore::Modify() {
     string statement;
     getline(cin, statement);
-    if (account_system.currentAccount.Get_Rank()<3) throw "Invalid";
+    if (account_system.currentAccount.Get_Rank() < 3) throw "Invalid";
     Trim(statement);
     vector<string> tokens;
     Split(statement, tokens);
@@ -349,7 +346,7 @@ void Bookstore::Modify() {
 void Bookstore::Import() {
     string statement;
     getline(cin, statement);
-    if (account_system.currentAccount.Get_Rank()<3) throw "Invalid";
+    if (account_system.currentAccount.Get_Rank() < 3) throw "Invalid";
     Trim(statement);
     vector<string> tokens;
     Split(statement, tokens);
