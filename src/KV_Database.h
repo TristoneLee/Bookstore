@@ -1,12 +1,10 @@
 #ifndef KV_DATABASE_H
 #define KV_DATABASE_H
 
-#include <string>
-#include <cstring>
+#include "MyString.h"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
-#include <string.h>
 #include <vector>
 
 using std::string;
@@ -18,8 +16,10 @@ using std::cin;
 using std::endl;
 
 const int blockCap = 320;
-const int indexLen = 65;
 const int indexCap = 500;
+
+template<class T>
+class Block;
 
 template<class Type>
 class iofile {
@@ -36,7 +36,7 @@ public:
         file.open(file_name);
         if (file) {
             file.seekg(0);
-            file.read(reinterpret_cast<char*>(&count),sizeof(int));
+            file.read(reinterpret_cast<char *>(&count), sizeof(int));
             file.close();
         } else {
             file.clear();
@@ -61,7 +61,7 @@ public:
             availablePlace.pop_back();
         }
         file.seekp(0);
-        file.write(reinterpret_cast<char*>(&count),sizeof(int));
+        file.write(reinterpret_cast<char *>(&count), sizeof(int));
         file.seekp(tmp);
         file.write(reinterpret_cast<char *>(&t), sizeofT);
         file.close();
@@ -95,29 +95,29 @@ public:
 template<class T>
 class Pair {
 protected:
-    char index[indexLen];
+    MyString index;
     T value;
 
 public:
+    friend class Block<T>;
+
     Pair() = default;
 
-    Pair(const char _str[indexLen], const T &_value) : value(_value) {
-        strcpy(index, _str);
+    Pair(const MyString _str, const T &_value) : value(_value), index(_str) {
     };  //todo:_str超长时异常抛出
 
-    const char *const indexOf() const { return index; }
+    MyString indexOf() const { return index; }
 
     T valueOf() const { return value; }
 
-
     friend bool operator<(const Pair &p, const Pair &q) {
-        if (strcmp(p.index, q.index) < 0) return true;
-        else if (strcmp(p.index, q.index) > 0) return false;
+        if (p.index < q.index) return true;
+        if (p.index > q.index) return false;
         else return p.value < q.value;
     }
 
     friend bool operator==(const Pair &p, const Pair &q) {
-        if (strcmp(p.index, q.index) != 0) return false;
+        if (p.index != q.index) return false;
         else return p.value == q.value;
     }
 
@@ -141,7 +141,7 @@ public:
         }
     }
 
-    const int sizeOf() const { return size; }
+    int sizeOf() const { return size; }
 
     const Pair<T> &Back() const { return array[size - 1]; }
 
@@ -161,7 +161,7 @@ public:
 
     bool addInBlock(const Pair<T> &obj) {
         int loc = std::lower_bound(array, array + size, obj) - array;
-        if (array[loc] == obj) throw "Already Have";
+        if (array[loc] == obj &&loc!=size) throw "Invalid";
         ++size;
         for (int i = size - 1; i > loc; --i) array[i] = array[i - 1];
         array[loc] = obj;
@@ -170,18 +170,29 @@ public:
 
     bool deleteInBlock(const Pair<T> &obj) {
         int loc = std::lower_bound(array, array + size, obj) - array;
-        if (array[loc] != obj) throw "Cannot Find";
+        if (array[loc] != obj) throw "Invalid";
         --size;
         for (int i = loc; i < size; ++i) array[i] = array[i + 1];
         return size > (blockCap / 2);
     }
 
-    void findInBlock(const char obj[65], vector<Pair<T>> &ans) {
+    void findInBlock(MyString obj, vector<T> &ans) {
         for (int i = 0; i < size; ++i) {
-            if (strcmp(obj, array[i].indexOf()) == 0) {
-                ans.push_back(array[i]);
+            if (obj == array[i].indexOf()) {
+                ans.push_back(array[i].valueOf());
             }
         }
+    }
+
+    void showInBlock(vector<T> &ans) {
+        for (int i = 0; i < size; ++i)
+            ans.push_back(array[i].valueOf());
+    }
+
+    void updateInBlock(const Pair<T> &obj, T _value) {
+        int loc = std::lower_bound(array, array + size, obj) - array;
+        if (array[loc] != obj) throw "Invalid";
+        array[loc].value = _value;
     }
 
 };
@@ -191,7 +202,7 @@ class BlockList {
 private:
     iofile<Block<T>> blockList;
     fstream indexList;
-    int indexArray[indexCap]={0};
+    int indexArray[indexCap] = {0};
     int blockCount = 0;
     string fileName;
 public:
@@ -212,7 +223,7 @@ public:
         }
     }
 
-    ~BlockList(){
+    ~BlockList() {
         indexList.open(fileName + "_index");
         indexList.seekg(0);
         indexList.write(reinterpret_cast<char *>(&blockCount), sizeof(int));
@@ -265,7 +276,7 @@ public:
 
     void Delete(const Pair<T> &obj) {
         Block<T> tmp;
-        if (blockCount == 0) throw "Invalid Delete";
+        if (blockCount == 0) throw "Invalid";
         int presentBlock = 0;
         do {
             ++presentBlock;
@@ -284,24 +295,43 @@ public:
         blockList.update(tmp, indexArray[presentBlock - 1]);
     }
 
-    void Find(const char obj[indexLen]) {
-        if (blockCount == 0) throw "Invalid Find";
+    std::vector<T> Find(MyString obj) {
+        if (blockCount == 0) return vector<T>();
         int presentBlock = 0;
-        vector<Pair<T>> ans;
+        vector<T> ans;
         Block<T> tmp;
         for (presentBlock; presentBlock < blockCount; ++presentBlock) {
             blockList.read(tmp, indexArray[presentBlock]);
-            if (strcmp(tmp.Back().indexOf(), obj) <0) continue;
-            if (strcmp(obj, tmp.Front().indexOf()) <0) break;
+            if (tmp.Back().indexOf() < obj) continue;
+            if (obj < tmp.Front().indexOf()) break;
             tmp.findInBlock(obj, ans);
         }
-        if (ans.size() == 0) cout << "null" << endl;
-        else {
-            for (int i = 0; i < ans.size() - 1; ++i) {
-                cout << ans[i].valueOf() << ' ';
-            }
-            cout << ans[ans.size() - 1].valueOf() << endl;
+        return ans;
+    }
+
+    std::vector<T> Show() {
+        int presentBlock = 0;
+        vector<T> ans;
+        Block<T> tmp;
+        for (presentBlock; presentBlock < blockCount; ++presentBlock) {
+            blockList.read(tmp, indexArray[presentBlock]);
+            tmp.showInBlock(ans);
         }
+        return ans;
+    }
+
+    void Update(const Pair<T> &obj, T _value) {
+        Block<T> tmp;
+        if (blockCount == 0) throw "Invalid";
+        int presentBlock = 0;
+        do {
+            ++presentBlock;
+            if (presentBlock == blockCount) break;
+            blockList.read(tmp, indexArray[presentBlock - 1]);
+        } while (tmp.Back() < obj);
+        blockList.read(tmp, indexArray[presentBlock - 1]);
+        tmp.updateInBlock(obj, _value);
+        blockList.update(tmp, indexArray[presentBlock - 1]);
     }
 };
 
