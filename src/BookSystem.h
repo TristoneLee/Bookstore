@@ -168,7 +168,7 @@ void BookSystem::Update_Book(const Book &obj) {
 void BookSystem::Restock_Book(Book &obj, int quantity) {
     int Quantity=stockFile.Find(obj.ISBN).front();
     Quantity += quantity;
-    stockFile.Update(Pair(obj.ISBN,Quantity),Quantity);
+    stockFile.Update(Pair(obj.ISBN,Quantity-quantity),Quantity);
 }
 
 double BookSystem::Sell_Book(Book &obj, int quantity) {
@@ -176,6 +176,7 @@ double BookSystem::Sell_Book(Book &obj, int quantity) {
     if (Quantity < quantity) throw 1;
     else {
         Quantity -= quantity;
+        stockFile.Update(Pair(obj.ISBN,Quantity+quantity),Quantity);
         cout << std::fixed << std::setprecision(2) << quantity * obj.Price << "\n";
         return quantity * obj.Price;
     }
