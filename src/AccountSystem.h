@@ -21,6 +21,7 @@ private:
     MyString Name;
     MyString Password;
     int Rank = 0;
+    Book BookSelected;
 
 public:
     Account() = default;
@@ -28,6 +29,10 @@ public:
     ~Account()=default;
 
     Account(const MyString &id, const MyString &name, const MyString &password, int rank);
+
+    Book Get_Book_Selected();
+
+    void Set_Book_Selected(const Book &obj);
 
     friend bool operator<(const Account &a,const Account &b){
         if(a.ID<b.ID) return true;
@@ -41,26 +46,21 @@ public:
     int Get_Rank(){
         return Rank;
     }
+
+    bool if_Select=false;
 };
 
 
 class AccountSystem {
     friend class Bookstore;
 private:
-    Account currentAccount;
     std::vector<Account> accountStack;
     BlockList<Account> accountFile;
-    Book BookSelected;
-    bool if_Select=false;
 
 public:
-    Account Get_Current_Account();
+    Account currentAccount;
 
     void Login(const MyString &user_id, const MyString &password);
-
-    Book Get_Book_Selected();
-
-    void Set_Book_Selected(const Book &obj);
 
     void Logout();
 
@@ -84,23 +84,25 @@ public:
 Account::Account(const MyString &id, const MyString &name, const MyString &password, int rank) :
         ID(id), Name(name), Password(password), Rank(rank) {}
 
-Book AccountSystem::Get_Book_Selected() {
+Book Account::Get_Book_Selected() {
     return BookSelected;
 }
 
-void AccountSystem::Set_Book_Selected(const Book &obj) {
+void Account::Set_Book_Selected(const Book &obj) {
     BookSelected=obj;
 }
-
-Account AccountSystem::Get_Current_Account() { return currentAccount; }
 
 void AccountSystem::Login(const MyString &user_id, const MyString &password) {
     Account obj = this->Find(user_id);
     if (currentAccount.Rank > obj.Rank) {
+        accountStack.pop_back();
+        accountStack.push_back(currentAccount);
         currentAccount = obj;
         accountStack.push_back(obj);
         return;
     } else if (obj.Password == password) {
+        accountStack.pop_back();
+        accountStack.push_back(currentAccount);
         currentAccount = obj;
         accountStack.push_back(obj);
         return;
@@ -164,14 +166,14 @@ AccountSystem::AccountSystem() : accountFile(BlockList<Account>("AccountFile")),
 
 void AccountSystem::Select_Book(const MyString &isbn,BookSystem &bookSystem) {
     vector<Book> ans=bookSystem.Query_Book(isbn,1);
-    if_Select=true;
+    currentAccount.if_Select=true;
     if(ans.empty()) {auto newBook=Book();
         newBook.Set_ISBN(isbn);
         bookSystem.Update_Book(newBook);
         bookSystem.Creat_Book(newBook);
-        BookSelected=newBook;
+        currentAccount.Set_Book_Selected(newBook);
     }
-    else BookSelected=ans.front();
+    else currentAccount.Set_Book_Selected(ans.front());
 }
 
 

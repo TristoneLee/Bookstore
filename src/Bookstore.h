@@ -247,6 +247,7 @@ void Bookstore::Show() {
     vector<string> tokens;
     Split(statement, tokens);
     if (tokens.size() != 0 && tokens.front() == "finance") {
+        if (account_system.currentAccount.Get_Rank() < 7) throw "Invalid";
         if (tokens.size() == 2) Show_Finance(std::atoi(tokens.back().c_str()));
         else Show_Finance();
         return;
@@ -286,7 +287,7 @@ void Bookstore::Modify() {
     string statement;
     getline(cin, statement);
     if (account_system.currentAccount.Get_Rank() < 3) throw "Invalid";
-    if (account_system.if_Select == false) throw "Invalid";
+    if (account_system.currentAccount.if_Select == false) throw "Invalid";
     Trim(statement);
     vector<string> tokens;
     Split(statement, tokens);
@@ -322,7 +323,7 @@ void Bookstore::Modify() {
             restrictions[4] = tmp.back();
         }
     }
-    Book currentBook = account_system.Get_Book_Selected();
+    Book currentBook = account_system.currentAccount.Get_Book_Selected();
     book_system.Takeout_Book(currentBook);
     for (int i = 0; i < 5; ++i) {
         if (DON[i] == true && i != 3 && i != 4) {
@@ -340,19 +341,20 @@ void Bookstore::Modify() {
         }
     }
     book_system.Update_Book(currentBook);
-    account_system.Set_Book_Selected(currentBook);
+    account_system.currentAccount.Set_Book_Selected(currentBook);
 }
 
 void Bookstore::Import() {
     string statement;
     getline(cin, statement);
     if (account_system.currentAccount.Get_Rank() < 3) throw "Invalid";
-    if (!account_system.if_Select) throw "Invalid";
+    if (!account_system.currentAccount.if_Select) {
+    throw "Invalid"; }
     Trim(statement);
     vector<string> tokens;
     Split(statement, tokens);
     if (tokens.size() != 2) throw "Invalid";
-    Book currentBook = account_system.Get_Book_Selected();
+    Book currentBook = account_system.currentAccount.Get_Book_Selected();
     book_system.Restock_Book(currentBook, std::atoi(tokens.front().c_str()));
     log_system.Save_Finance(std::atof(tokens.back().c_str()), false);
 }
