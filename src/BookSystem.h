@@ -41,6 +41,8 @@ public:
 
     void Set_Index(const MyString &index);
 
+    MyString Get_ISBN(){return ISBN;}
+
     MyString Get_Index();
 
     void Display();
