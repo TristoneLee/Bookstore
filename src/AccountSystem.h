@@ -169,6 +169,8 @@ void AccountSystem::Select_Book(const MyString &isbn,BookSystem &bookSystem) {
     currentAccount.if_Select=true;
     if(ans.empty()) {auto newBook=Book();
         newBook.Set_ISBN(isbn);
+        bookSystem.Plus_Index();
+        newBook.Set_Index(MyString(std::to_string(bookSystem.Get_Index())));
         bookSystem.Update_Book(newBook);
         bookSystem.Creat_Book(newBook);
         currentAccount.Set_Book_Selected(newBook);

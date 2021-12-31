@@ -67,7 +67,6 @@ bool Digit_Checker(const string & str){
 
 const int commandLen = 1025;
 
-
 class Bookstore {
 private:
     AccountSystem account_system;
@@ -177,6 +176,12 @@ void Bookstore::Su() {
 
 void Bookstore::Logout() {
     account_system.Logout();
+    if (account_system.currentAccount.if_Select){
+        vector<Book> ans;
+        ans=book_system.Query_Book(account_system.
+                currentAccount.Get_Book_Selected().Get_Index(),6);
+        account_system.currentAccount.Set_Book_Selected(ans.back());
+    }
 }
 
 void Bookstore::Register() {
@@ -347,24 +352,24 @@ void Bookstore::Modify() {
             DON[0] = true;
             restrictions[0] = tmp.back();
         }
-        if (tmp.front() == "-name") {
+        else if (tmp.front() == "-name") {
             if (DON[1] == true) throw "Invalid";
             if(!Book_Checker(tmp.back())) throw "Invalid";
             DON[1] = true;
             restrictions[1] = tmp.back().substr(1, tmp.back().length() - 2);
         }
-        if (tmp.front() == "-author") {
+        else if (tmp.front() == "-author") {
             if (DON[2] == true) throw "Invalid";
             if(!Book_Checker(tmp.back())) throw "Invalid";
             DON[2] = true;
             restrictions[2] = tmp.back().substr(1, tmp.back().length() - 2);
         }
-        if (tmp.front() == "-keyword") {
+        else if (tmp.front() == "-keyword") {
             if (DON[3] == true) throw "Invalid";
             DON[3] = true;
             restrictions[3] = tmp.back().substr(1, tmp.back().length() - 2);
         }
-        if (tmp.front() == "-price") {
+        else if (tmp.front() == "-price") {
             if (DON[4] == true) throw "Invalid";
             if(!Digit_Checker(tmp.back())) throw "Invalid";
             DON[4] = true;
