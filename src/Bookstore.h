@@ -31,13 +31,39 @@ void Split(const string &str,
 
 bool ISBN_Checker(const string &str) {
     for (int i = 0; i < str.size(); i++) {
-        if (!isdigit(str[i])) {
+        if (!isprint(str[i])) {
             return false;
         }
     }
     return true;
 }
 
+bool Book_Checker(const string &str){
+    for (int i = 0; i < str.size(); i++) {
+        if (!isprint(str[i]) && str[i] != '\"') {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool Account_Checker(const string & str){
+    for (int i = 0; i < str.size(); i++) {
+        if (!isalnum(str[i])&&str[i]!='_') {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool Digit_Checker(const string & str){
+    for (int i = 0; i < str.size(); i++) {
+        if (!isdigit(str[i])) {
+            return false;
+        }
+    }
+    return true;
+}
 
 const int commandLen = 1025;
 
@@ -164,6 +190,7 @@ void Bookstore::Register() {
     if (tokens.back().size() > stringLen || tokens.front().size() > stringLen
         || (*iter).size() > stringLen)
         throw "Invalid";
+    if(!Account_Checker(tokens.front())||!ISBN_Checker(tokens.back())||!Account_Checker(*iter)) throw "Invalid";
     account_system.Register(MyString::to_MyString(tokens.front()),
                             MyString::to_MyString(tokens.back()), MyString::to_MyString(*iter));
 }
@@ -175,6 +202,7 @@ void Bookstore::Passwd() {
     vector<string> tokens;
     Split(statement, tokens);
     if (tokens.size() < 2 || tokens.size() > 3) throw "Invalid";
+    if(!Account_Checker(tokens.back())) throw "Invalid";
     else if (tokens.size() == 2) {
         account_system.Change_Password_Root(MyString::to_MyString(tokens.front()),
                                             MyString::to_MyString(tokens.back()));
@@ -199,6 +227,9 @@ void Bookstore::Useradd() {
     else {
         auto iter1 = tokens.begin() + 1;
         auto iter2 = iter1 + 1;
+        if(!Account_Checker(*iter1)||!Account_Checker(tokens.front())) throw "Invalid";
+        if(!ISBN_Checker(tokens.back())) throw "Invalid";
+        if(!Digit_Checker(*iter2)) throw "Invalid";
         if (tokens.back().size() > stringLen || tokens.front().size() > stringLen
             || (*iter1).size() > stringLen || (*iter2).size() > stringLen)
             throw "Invalid";
@@ -247,6 +278,7 @@ void Bookstore::Select() {
     vector<string> tokens;
     Split(statement, tokens);
     if (tokens.size() != 1) throw "Invalid";
+    if(!ISBN_Checker(tokens.back())) throw "Invalid";
     account_system.Select_Book(MyString::to_MyString(tokens.front()), book_system);
 }
 
@@ -311,16 +343,19 @@ void Bookstore::Modify() {
         Split(*iter, tmp, "=");
         if (tmp.front() == "-ISBN") {
             if (DON[0] == true) throw "Invalid";
+            if(!ISBN_Checker(tmp.back())) throw "Invalid";
             DON[0] = true;
             restrictions[0] = tmp.back();
         }
         if (tmp.front() == "-name") {
             if (DON[1] == true) throw "Invalid";
+            if(!Book_Checker(tmp.back())) throw "Invalid";
             DON[1] = true;
             restrictions[1] = tmp.back().substr(1, tmp.back().length() - 2);
         }
         if (tmp.front() == "-author") {
             if (DON[2] == true) throw "Invalid";
+            if(!Book_Checker(tmp.back())) throw "Invalid";
             DON[2] = true;
             restrictions[2] = tmp.back().substr(1, tmp.back().length() - 2);
         }
@@ -343,6 +378,9 @@ void Bookstore::Modify() {
         } else if (DON[i] == true && i == 3) {
             vector<string> _keywords;
             Split(restrictions[i], _keywords, "|");
+            for (auto iter=_keywords.begin();iter!=_keywords.end();++iter){
+                if(!Book_Checker(*iter)) throw "Invalid";
+            }
             vector<MyString> _Keywords;
             for (auto iter = _keywords.begin(); iter != _keywords.end(); ++iter) {
                 _Keywords.push_back(MyString::to_MyString(*iter));
