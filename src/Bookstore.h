@@ -217,16 +217,13 @@ void Bookstore::Buy() {
     vector<Book> ans;
     ans = book_system.Query_Book(MyString::to_MyString(tokens.front()), 1);
     if (ans.empty()) throw "Invalid";
-    book_system.Takeout_Book(ans.front());
     double a=0;
     try {
         a = book_system.Sell_Book(ans.front(), std::atoi(tokens.back().c_str()));
     }
     catch (int) {
-        book_system.Update_Book(ans.front());
         throw "Invalid";
     }
-    book_system.Update_Book(ans.front());
     log_system.Save_Finance(a, true);
 }
 
@@ -354,11 +351,8 @@ void Bookstore::Import() {
     Split(statement, tokens);
     if (tokens.size() != 2) throw "Invalid";
     Book currentBook = account_system.Get_Book_Selected();
-    book_system.Takeout_Book(currentBook);
     book_system.Restock_Book(currentBook, std::atoi(tokens.front().c_str()));
-    book_system.Update_Book(currentBook);
     log_system.Save_Finance(std::atof(tokens.back().c_str()), false);
-    account_system.Set_Book_Selected(currentBook);
 }
 
 void Bookstore::Show_Finance(int i) {

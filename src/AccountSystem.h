@@ -166,6 +166,7 @@ void AccountSystem::Select_Book(const MyString &isbn,BookSystem &bookSystem) {
     if(ans.empty()) {auto newBook=Book();
         newBook.Set_ISBN(isbn);
         bookSystem.Update_Book(newBook);
+        bookSystem.Creat_Book(newBook);
         BookSelected=newBook;
     }
     else BookSelected=ans.front();

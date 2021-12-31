@@ -11,6 +11,8 @@ const int bookNameLen = 60;
 const int ISBNLen = 20;
 const int keywordLen = 60;
 
+BlockList<int> stockFile("stockFile");
+
 vector<string> KeywordsParser(string keywords);
 
 class Book;
@@ -25,7 +27,6 @@ private:
     MyString BookName;
     MyString Author;
     MyString Keywords[10];
-    int Quantity = 0;
     double Price = 0;
     MyString Keyword;
     int KeywordsNum;
@@ -49,7 +50,6 @@ public:
         else if (a.Author != b.Author) return false;
         else if (a.Price != b.Price) return false;
         else if (a.KeywordsNum != b.KeywordsNum) return false;
-        else if (a.Quantity != b.Quantity) return false;
         else
             for (int i = 0; i < a.KeywordsNum; ++i) {
                 if (a.Keywords[i] != b.Keywords[i]) return false;
@@ -73,7 +73,7 @@ public:
 
     vector<Book> Show_All();
 
-    void Creat_Book(Book obj);
+    void Creat_Book(const Book &obj);
 
     void Change_Book(Book &obj, const MyString &changed_info, const int &flag);
 
@@ -88,12 +88,14 @@ public:
     void Restock_Book(Book &obj, int quantity);
 
     double Sell_Book(Book &obj, int quantity);
+
+    void Change_ISBN (const MyString &former,const MyString &latter );
 };
 
 BookSystem::BookSystem() : bookFileBasedOnISBN(BlockList<Book>("BookFileBasedOnISBN")),
                            bookFileBasedOnName(BlockList<Book>("BookFileBasedOnName")),
                            bookFileBasedOnAuthor(BlockList<Book>("BookFileBasedOnAuthor")),
-                           bookFileBasedOnKeywords(BlockList<Book>("BookFileBasedOnKeywords")) {}
+                           bookFileBasedOnKeywords(BlockList<Book>("BookFileBasedOnKeywords")){}
 
 vector<Book> BookSystem::Query_Book(const MyString &restriction, const int &flag) {
     switch (flag) {
@@ -119,6 +121,7 @@ vector<Book> BookSystem::Query_Book(const MyString &restriction, const int &flag
 void BookSystem::Change_Book(Book &obj, const MyString &changed_info, const int &flag) {
     switch (flag) {
         case 1: {
+            Change_ISBN(obj.ISBN,changed_info);
             obj.ISBN = changed_info;
             break;
         }
@@ -163,13 +166,16 @@ void BookSystem::Update_Book(const Book &obj) {
 }
 
 void BookSystem::Restock_Book(Book &obj, int quantity) {
-    obj.Quantity += quantity;
+    int Quantity=stockFile.Find(obj.ISBN).front();
+    Quantity += quantity;
+    stockFile.Update(Pair(obj.ISBN,Quantity),Quantity);
 }
 
 double BookSystem::Sell_Book(Book &obj, int quantity) {
-    if (obj.Quantity < quantity) throw 1;
+    int Quantity=stockFile.Find(obj.ISBN).front();
+    if (Quantity < quantity) throw 1;
     else {
-        obj.Quantity -= quantity;
+        Quantity -= quantity;
         cout << std::fixed << std::setprecision(2) << quantity * obj.Price << "\n";
         return quantity * obj.Price;
     }
@@ -179,6 +185,16 @@ vector<Book> BookSystem::Show_All() {
     vector<Book> ans;
     ans = bookFileBasedOnISBN.Show();
     return ans;
+}
+
+void BookSystem::Creat_Book(const Book &obj) {
+    stockFile.Add(Pair(obj.ISBN,0));
+}
+
+void BookSystem::Change_ISBN(const MyString &former, const MyString &latter) {
+    int a=stockFile.Find(former).front();
+    stockFile.Delete(Pair(former,a));
+    stockFile.Add(Pair(latter,a));
 }
 
 void Book::Set_ISBN(const MyString &isbn) {
@@ -193,7 +209,7 @@ void Book::Display() {
     if (KeywordsNum != 0)
         cout << Keywords[KeywordsNum - 1];
     cout << '\t' << std::fixed << std::setprecision(2)
-         << Price << '\t' << std::fixed << std::setprecision(2) << Quantity << '\n';
+         << Price << '\t' << std::fixed << std::setprecision(2) << stockFile.Find(ISBN).front() << '\n';
 }
 
 
