@@ -58,7 +58,7 @@ bool Account_Checker(const string & str){
 
 bool Digit_Checker(const string & str){
     for (int i = 0; i < str.size(); i++) {
-        if (!isdigit(str[i])) {
+        if (!isdigit(str[i])&&str[i]!='.') {
             return false;
         }
     }
@@ -366,6 +366,7 @@ void Bookstore::Modify() {
         }
         if (tmp.front() == "-price") {
             if (DON[4] == true) throw "Invalid";
+            if(!Digit_Checker(tmp.back())) throw "Invalid";
             DON[4] = true;
             restrictions[4] = tmp.back();
         }
