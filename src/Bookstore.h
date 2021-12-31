@@ -84,11 +84,11 @@ public:
 
     void Report();
 
-    void Report_Myself();
+    void Report_Myself(){};
 
-    void Report_Finance();
+    void Report_Finance(){};
 
-    void Report_Employee();
+    void Report_Employee(){};
 
     void Log();
 };
@@ -109,8 +109,8 @@ void Bookstore::work() {
     else if (command == "select") { Bookstore::Select(); }
     else if (command == "modify") { Bookstore::Modify(); }
     else if (command == "import") { Bookstore::Import(); }
-//    else if (command == "report") { Bookstore::Report(); }
-//    else if (command == "log") { Bookstore::Log(); }
+    else if (command == "report") { Bookstore::Report(); }
+    else if (command == "log") { Bookstore::Log(); }
     else {
         string a;
         getline(cin, a);
@@ -119,10 +119,22 @@ void Bookstore::work() {
 }
 
 void Bookstore::Quit() {
+    string statement;
+    getline(cin, statement);
+    Trim(statement);
+    vector<string> tokens;
+    Split(statement, tokens);
+    if(tokens.size()!=0) throw "Invalid";
     throw 1;
 }
 
 void Bookstore::Exit() {
+    string statement;
+    getline(cin, statement);
+    Trim(statement);
+    vector<string> tokens;
+    Split(statement, tokens);
+    if(tokens.size()!=0) throw "Invalid";
     throw 1;
 }
 
@@ -365,6 +377,28 @@ void Bookstore::Show_Finance(int i) {
 
 void Bookstore::Show_Finance() {
     log_system.Show_Finance();
+}
+
+void Bookstore::Report() {
+    string statement;
+    getline(cin, statement);
+    Trim(statement);
+    vector<string> tokens;
+    Split(statement, tokens);
+    if(tokens.size()!=2) throw "Invalid";
+    else if(tokens.back()=="myself") Report_Myself();
+    else if(tokens.back()=="finance") Report_Finance();
+    else if(tokens.back()=="employee") Report_Employee();
+    else throw "Invalid";
+}
+
+void Bookstore::Log() {
+    string statement;
+    getline(cin, statement);
+    Trim(statement);
+    vector<string> tokens;
+    Split(statement, tokens);
+    if(tokens.size()!=0) throw "Invalid";
 }
 
 
