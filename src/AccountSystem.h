@@ -51,6 +51,7 @@ private:
     std::vector<Account> accountStack;
     BlockList<Account> accountFile;
     Book BookSelected;
+    bool if_Select=false;
 
 public:
     Account Get_Current_Account();
@@ -163,6 +164,7 @@ AccountSystem::AccountSystem() : accountFile(BlockList<Account>("AccountFile")),
 
 void AccountSystem::Select_Book(const MyString &isbn,BookSystem &bookSystem) {
     vector<Book> ans=bookSystem.Query_Book(isbn,1);
+    if_Select=true;
     if(ans.empty()) {auto newBook=Book();
         newBook.Set_ISBN(isbn);
         bookSystem.Update_Book(newBook);

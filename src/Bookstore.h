@@ -95,7 +95,7 @@ public:
 
 void Bookstore::work() {
     string command;
-    if(!(cin >> command)) Bookstore::Quit();
+    if (!(cin >> command)) Bookstore::Quit();
     if (command == "quit") { Bookstore::Quit(); }
     else if (command == "exit") { Bookstore::Exit(); }
     else if (command == "su") { Bookstore::Su(); }
@@ -209,7 +209,7 @@ void Bookstore::Delete() {
 void Bookstore::Buy() {
     string statement;
     getline(cin, statement);
-    if (account_system.currentAccount.Get_Rank()<1) throw "Invalid";
+    if (account_system.currentAccount.Get_Rank() < 1) throw "Invalid";
     Trim(statement);
     vector<string> tokens;
     Split(statement, tokens);
@@ -217,7 +217,7 @@ void Bookstore::Buy() {
     vector<Book> ans;
     ans = book_system.Query_Book(MyString::to_MyString(tokens.front()), 1);
     if (ans.empty()) throw "Invalid";
-    double a=0;
+    double a = 0;
     try {
         a = book_system.Sell_Book(ans.front(), std::atoi(tokens.back().c_str()));
     }
@@ -242,7 +242,7 @@ void Bookstore::Show() {
     string statement;
     getline(cin, statement);
     if (account_system.accountStack.size() == 1) throw "Invalid";
-    if (account_system.currentAccount.Get_Rank()<1) throw "Invalid";
+    if (account_system.currentAccount.Get_Rank() < 1) throw "Invalid";
     Trim(statement);
     vector<string> tokens;
     Split(statement, tokens);
@@ -286,6 +286,7 @@ void Bookstore::Modify() {
     string statement;
     getline(cin, statement);
     if (account_system.currentAccount.Get_Rank() < 3) throw "Invalid";
+    if (account_system.if_Select == false) throw "Invalid";
     Trim(statement);
     vector<string> tokens;
     Split(statement, tokens);
@@ -346,6 +347,7 @@ void Bookstore::Import() {
     string statement;
     getline(cin, statement);
     if (account_system.currentAccount.Get_Rank() < 3) throw "Invalid";
+    if (!account_system.if_Select) throw "Invalid";
     Trim(statement);
     vector<string> tokens;
     Split(statement, tokens);
