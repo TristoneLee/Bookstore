@@ -21,7 +21,6 @@ private:
     MyString Name;
     MyString Password;
     int Rank = 0;
-    Book BookSelected;
 
 public:
     Account() = default;
@@ -29,10 +28,6 @@ public:
     ~Account()=default;
 
     Account(const MyString &id, const MyString &name, const MyString &password, int rank);
-
-    Book Get_Book_Selected();
-
-    void Set_Book_Selected(const Book &obj);
 
     friend bool operator<(const Account &a,const Account &b){
         if(a.ID<b.ID) return true;
@@ -55,11 +50,16 @@ private:
     Account currentAccount;
     std::vector<Account> accountStack;
     BlockList<Account> accountFile;
+    Book BookSelected;
 
 public:
     Account Get_Current_Account();
 
     void Login(const MyString &user_id, const MyString &password);
+
+    Book Get_Book_Selected();
+
+    void Set_Book_Selected(const Book &obj);
 
     void Logout();
 
@@ -83,11 +83,11 @@ public:
 Account::Account(const MyString &id, const MyString &name, const MyString &password, int rank) :
         ID(id), Name(name), Password(password), Rank(rank) {}
 
-Book Account::Get_Book_Selected() {
+Book AccountSystem::Get_Book_Selected() {
     return BookSelected;
 }
 
-void Account::Set_Book_Selected(const Book &obj) {
+void AccountSystem::Set_Book_Selected(const Book &obj) {
     BookSelected=obj;
 }
 
@@ -108,7 +108,6 @@ void AccountSystem::Login(const MyString &user_id, const MyString &password) {
 
 void AccountSystem::Logout() {
     if (accountStack.size()==1) throw "Invalid";
-    currentAccount.Set_Book_Selected(Book());
     accountStack.pop_back();
     currentAccount = accountStack.back();
 }
@@ -167,9 +166,9 @@ void AccountSystem::Select_Book(const MyString &isbn,BookSystem &bookSystem) {
     if(ans.empty()) {auto newBook=Book();
         newBook.Set_ISBN(isbn);
         bookSystem.Update_Book(newBook);
-        currentAccount.BookSelected=newBook;
+        BookSelected=newBook;
     }
-    else currentAccount.BookSelected=ans.front();
+    else BookSelected=ans.front();
 }
 
 

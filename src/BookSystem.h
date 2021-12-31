@@ -44,15 +44,16 @@ public:
     }
 
     friend bool operator==(const Book &a, const Book &b) {
-        if(a.ISBN!=b.ISBN) return false;
-        else if(a.BookName!=b.BookName) return false;
-        else if(a.Author!=b.Author) return false;
-        else if(a.Price!=b.Price) return false ;
-        else if(a.KeywordsNum!=b.KeywordsNum) return false;
-        else if(a.Quantity!=b.Quantity) return false;
-        else for (int i=0;i<a.KeywordsNum;++i){
-            if (a.Keywords[i]!=b.Keywords[i]) return false;
-        }
+        if (a.ISBN != b.ISBN) return false;
+        else if (a.BookName != b.BookName) return false;
+        else if (a.Author != b.Author) return false;
+        else if (a.Price != b.Price) return false;
+        else if (a.KeywordsNum != b.KeywordsNum) return false;
+        else if (a.Quantity != b.Quantity) return false;
+        else
+            for (int i = 0; i < a.KeywordsNum; ++i) {
+                if (a.Keywords[i] != b.Keywords[i]) return false;
+            }
         return true;
     }
 };
@@ -135,19 +136,19 @@ void BookSystem::Change_Book(Book &obj, const double &changed_info, const int &f
 }
 
 void BookSystem::Change_Book(Book &obj, vector<MyString> changed_info, const int &flag) {
-    int i=0;
-    for(auto iter=changed_info.begin();iter!=changed_info.end();++iter){
-        obj.Keywords[i]=*iter;
+    int i = 0;
+    for (auto iter = changed_info.begin(); iter != changed_info.end(); ++iter) {
+        obj.Keywords[i] = *iter;
         ++i;
     }
-    obj.KeywordsNum=i;
+    obj.KeywordsNum = i;
 }
 
 void BookSystem::Takeout_Book(const Book &obj) {
     bookFileBasedOnISBN.Delete(Pair(obj.ISBN, obj));
     bookFileBasedOnName.Delete(Pair(obj.BookName, obj));
     bookFileBasedOnAuthor.Delete(Pair(obj.Author, obj));
-    for (int i=0;i<obj.KeywordsNum;++i) {
+    for (int i = 0; i < obj.KeywordsNum; ++i) {
         bookFileBasedOnKeywords.Delete(Pair(obj.Keywords[i], obj));
     }
 }
@@ -156,7 +157,7 @@ void BookSystem::Update_Book(const Book &obj) {
     bookFileBasedOnISBN.Add(Pair(obj.ISBN, obj));
     bookFileBasedOnName.Add(Pair(obj.BookName, obj));
     bookFileBasedOnAuthor.Add(Pair(obj.Author, obj));
-    for (int i=0;i<obj.KeywordsNum;++i) {
+    for (int i = 0; i < obj.KeywordsNum; ++i) {
         bookFileBasedOnKeywords.Add(Pair(obj.Keywords[i], obj));
     }
 }
@@ -186,11 +187,13 @@ void Book::Set_ISBN(const MyString &isbn) {
 
 void Book::Display() {
     cout << ISBN << '\t' << BookName << '\t' << Author << '\t';
-    for (int i=0;i<KeywordsNum-1;++i) {
+    for (int i = 0; i < KeywordsNum - 1; ++i) {
         cout << Keywords[i] << "|";
     }
-    cout << Keywords[KeywordsNum-1] << '\t' << std::fixed << std::setprecision(2)
-    << Price << '\t' << std::fixed << std::setprecision(2)<< Quantity  << '\n';
+    if (KeywordsNum != 0)
+        cout << Keywords[KeywordsNum - 1];
+    cout << '\t' << std::fixed << std::setprecision(2)
+         << Price << '\t' << std::fixed << std::setprecision(2) << Quantity << '\n';
 }
 
 

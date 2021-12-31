@@ -209,6 +209,7 @@ void Bookstore::Delete() {
 void Bookstore::Buy() {
     string statement;
     getline(cin, statement);
+    if (account_system.currentAccount.Get_Rank()<1) throw "Invalid";
     Trim(statement);
     vector<string> tokens;
     Split(statement, tokens);
@@ -244,6 +245,7 @@ void Bookstore::Show() {
     string statement;
     getline(cin, statement);
     if (account_system.accountStack.size() == 1) throw "Invalid";
+    if (account_system.currentAccount.Get_Rank()<1) throw "Invalid";
     Trim(statement);
     vector<string> tokens;
     Split(statement, tokens);
@@ -322,7 +324,7 @@ void Bookstore::Modify() {
             restrictions[4] = tmp.back();
         }
     }
-    Book currentBook = account_system.Get_Current_Account().Get_Book_Selected();
+    Book currentBook = account_system.Get_Book_Selected();
     book_system.Takeout_Book(currentBook);
     for (int i = 0; i < 5; ++i) {
         if (DON[i] == true && i != 3 && i != 4) {
@@ -340,7 +342,7 @@ void Bookstore::Modify() {
         }
     }
     book_system.Update_Book(currentBook);
-    account_system.currentAccount.Set_Book_Selected(currentBook);
+    account_system.Set_Book_Selected(currentBook);
 }
 
 void Bookstore::Import() {
@@ -351,12 +353,12 @@ void Bookstore::Import() {
     vector<string> tokens;
     Split(statement, tokens);
     if (tokens.size() != 2) throw "Invalid";
-    Book currentBook = account_system.Get_Current_Account().Get_Book_Selected();
+    Book currentBook = account_system.Get_Book_Selected();
     book_system.Takeout_Book(currentBook);
     book_system.Restock_Book(currentBook, std::atoi(tokens.front().c_str()));
     book_system.Update_Book(currentBook);
     log_system.Save_Finance(std::atof(tokens.back().c_str()), false);
-    account_system.currentAccount.Set_Book_Selected(currentBook);
+    account_system.Set_Book_Selected(currentBook);
 }
 
 void Bookstore::Show_Finance(int i) {
